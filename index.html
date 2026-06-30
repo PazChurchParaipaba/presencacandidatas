@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista de Presença - Ensaios das Meninas</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #ff6b6b;
+            --primary-light: #ff8e8e;
+            --bg-color: #f8f9fa;
+            --card-bg: rgba(255, 255, 255, 0.9);
+            --text: #2b2b2b;
+            --text-light: #6c757d;
+            --success: #20c997;
+            --danger: #ff4757;
+            --info: #4facfe;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text);
+            min-height: 100vh;
+            padding-bottom: 2rem;
+            background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--primary) 0%, #ff8787 100%);
+            padding: 2rem 1rem;
+            text-align: center;
+            border-bottom-left-radius: 30px;
+            border-bottom-right-radius: 30px;
+            box-shadow: 0 10px 20px rgba(255, 107, 107, 0.15);
+            margin-bottom: 2rem;
+            color: white;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo-container {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 1rem;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 4px solid white;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            background: white;
+        }
+
+        .logo {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .date-picker-container {
+            margin-top: 10px;
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            align-items: center;
+        }
+
+        input[type="date"] {
+            padding: 10px;
+            border-radius: 10px;
+            border: none;
+            font-size: 1rem;
+            font-family: 'Outfit', sans-serif;
+            color: var(--text);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            outline: none;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 1rem;
+            background: var(--card-bg);
+            padding: 1rem;
+            border-radius: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            backdrop-filter: blur(10px);
+        }
+
+        input[type="text"] {
+            flex: 1;
+            padding: 12px 20px;
+            border: 2px solid #eee;
+            border-radius: 15px;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+
+        input[type="text"]:focus {
+            border-color: var(--primary);
+        }
+
+        button {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 15px;
+            background: var(--primary);
+            color: white;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        button:active {
+            transform: scale(0.95);
+        }
+        
+        button:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .action-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 2rem;
+        }
+
+        .btn-history { background: var(--info); }
+        .btn-download { background: var(--success); }
+
+        .list-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding: 0 0.5rem;
+        }
+
+        .list-header h2 {
+            font-size: 1.2rem;
+            color: var(--text);
+        }
+
+        .stats {
+            font-size: 0.9rem;
+            color: var(--text-light);
+            font-weight: 600;
+        }
+
+        .attendance-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .student-card {
+            background: var(--card-bg);
+            padding: 1rem 1.2rem;
+            border-radius: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+            transition: all 0.3s ease;
+            animation: slideIn 0.3s ease;
+            border-left: 5px solid #eee;
+        }
+
+        .student-card.present {
+            border-left-color: var(--success);
+            background: #f0fdf4;
+        }
+
+        .student-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex: 1;
+            cursor: pointer;
+        }
+
+        .student-name {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .student-initial {
+            width: 40px;
+            height: 40px;
+            background: var(--primary-light);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 1.2rem;
+        }
+
+        .actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .toggle-btn {
+            background: #eee;
+            color: var(--text-light);
+            width: 60px;
+            height: 60px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .present .toggle-btn {
+            background: var(--success);
+            color: white;
+            box-shadow: 0 4px 10px rgba(32, 201, 151, 0.3);
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(5px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+            z-index: 1000;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .modal {
+            background: white;
+            padding: 2rem;
+            border-radius: 25px;
+            width: 90%;
+            max-width: 400px;
+            max-height: 80vh;
+            overflow-y: auto;
+            transform: translateY(20px);
+            transition: transform 0.3s ease;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
+
+        .modal-overlay.active .modal {
+            transform: translateY(0);
+        }
+
+        .modal h3 {
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 1.5rem;
+        }
+
+        .modal-actions button {
+            flex: 1;
+        }
+
+        .btn-secondary {
+            background: #eee;
+            color: var(--text);
+        }
+
+        .history-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .history-item {
+            background: var(--bg-color);
+            padding: 1rem;
+            border-radius: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .history-item:hover {
+            background: #e9ecef;
+        }
+
+        .history-date {
+            font-weight: 600;
+        }
+
+        .history-count {
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+        
+        .loading-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(255,255,255,0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+        
+        .loading-overlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+        
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid var(--primary-light);
+            border-top: 4px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+    </style>
+</head>
+<body>
+    <div class="loading-overlay" id="loading-overlay">
+        <div class="spinner"></div>
+    </div>
+
+    <header class="header">
+        <div class="logo-container">
+            <img src="logoregata.png" alt="Logo" class="logo" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'100\' height=\'100\'><rect width=\'100\' height=\'100\' fill=\'%23ff8e8e\'/><text x=\'50\' y=\'55\' font-family=\'Arial\' font-size=\'14\' fill=\'white\' text-anchor=\'middle\'>Imagem Ausente</text></svg>'">
+        </div>
+        <h1>Lista de Presença</h1>
+        <div class="date-picker-container">
+            <input type="date" id="attendance-date" onchange="dateChanged()">
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="action-buttons">
+            <button class="btn-history" onclick="openHistoryModal()">📋 Ver Histórico</button>
+            <button class="btn-download" onclick="downloadReport()">💾 Salvar Arquivo</button>
+        </div>
+
+        <div class="controls">
+            <input type="text" id="name-input" placeholder="Adicionar nova participante..." autocomplete="off">
+            <button onclick="addName()">Add</button>
+        </div>
+
+        <div class="list-header">
+            <h2>Ensaios - Meninas</h2>
+            <div class="stats" id="stats-display">0 / 0 Presentes</div>
+        </div>
+
+        <ul class="attendance-list" id="student-list">
+            <!-- List injected via JS -->
+        </ul>
+    </div>
+
+    <!-- Edit/Delete Modal -->
+    <div class="modal-overlay" id="edit-modal">
+        <div class="modal">
+            <h3 id="modal-title">Gerenciar Participante</h3>
+            <input type="hidden" id="edit-original-id">
+            <input type="text" id="edit-name-input" style="width: 100%; margin-bottom: 1rem;">
+            <div class="modal-actions">
+                <button class="btn-secondary" onclick="closeEditModal()">Cancelar</button>
+                <button onclick="saveEdit()">Salvar</button>
+            </div>
+            <button class="btn-secondary" style="width: 100%; margin-top: 10px; background: #ffe3e3; color: var(--danger);" onclick="deleteStudent()">Remover Participante</button>
+        </div>
+    </div>
+
+    <!-- History Modal -->
+    <div class="modal-overlay" id="history-modal">
+        <div class="modal">
+            <h3>Histórico de Presenças</h3>
+            <ul class="history-list" id="history-list">
+                <!-- History injected via JS -->
+            </ul>
+            <div class="modal-actions">
+                <button class="btn-secondary" style="width: 100%;" onclick="closeHistoryModal()">Fechar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bibliotecas externas -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <script>
+        // Supabase Initialization
+        const supabaseUrl = 'https://groezaseypdbpgymgpvo.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdyb2V6YXNleXBkYnBneW1ncHZvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjYwNjkxNjYsImV4cCI6MjA4MTY0NTE2Nn0.5U5QeoGmZn_i9Y8POoUCkatBUAdSW-cjHRyfxpm_pyM';
+        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+        const dateInput = document.getElementById('attendance-date');
+        const today = new Date().toISOString().split('T')[0];
+        dateInput.value = today;
+
+        let candidates = [];
+        let currentPresentIds = []; // IDs of candidates present on the selected date
+
+        const listContainer = document.getElementById('student-list');
+        const nameInput = document.getElementById('name-input');
+        const statsDisplay = document.getElementById('stats-display');
+        const loadingOverlay = document.getElementById('loading-overlay');
+
+        function showLoading() { loadingOverlay.classList.add('active'); }
+        function hideLoading() { loadingOverlay.classList.remove('active'); }
+        function getCurrentDate() { return dateInput.value; }
+
+        async function initData() {
+            showLoading();
+            
+            // Fetch candidates
+            const { data: cData, error: cError } = await supabase
+                .from('candidates')
+                .select('*')
+                .order('name');
+                
+            if (cError) {
+                console.error("Erro ao carregar candidatas:", cError);
+                alert("Erro ao conectar com o banco de dados.");
+                hideLoading();
+                return;
+            }
+            
+            candidates = cData || [];
+            await loadAttendanceForDate(getCurrentDate());
+            hideLoading();
+        }
+
+        async function loadAttendanceForDate(date) {
+            const { data: aData, error: aError } = await supabase
+                .from('attendances')
+                .select('candidate_id, is_present')
+                .eq('date', date)
+                .eq('is_present', true);
+                
+            if (aError) {
+                console.error("Erro ao carregar presenças:", aError);
+                currentPresentIds = [];
+            } else {
+                currentPresentIds = (aData || []).map(a => a.candidate_id);
+            }
+            
+            renderList();
+        }
+
+        async function dateChanged() {
+            showLoading();
+            await loadAttendanceForDate(getCurrentDate());
+            hideLoading();
+        }
+
+        function renderList() {
+            listContainer.innerHTML = '';
+            let presentCount = 0;
+
+            candidates.forEach((candidate) => {
+                const isPresent = currentPresentIds.includes(candidate.id);
+                if (isPresent) presentCount++;
+
+                const li = document.createElement('li');
+                li.className = `student-card ${isPresent ? 'present' : ''}`;
+                
+                const initial = candidate.name.charAt(0).toUpperCase();
+                const encodedName = candidate.name.replace(/'/g, "\\'").replace(/"/g, '\\"');
+
+                li.innerHTML = `
+                    <div class="student-info" onclick="openEditModal('${candidate.id}', '${encodedName}')">
+                        <div class="student-initial">${initial}</div>
+                        <div class="student-name">${candidate.name}</div>
+                    </div>
+                    <div class="actions">
+                        <button class="toggle-btn" onclick="togglePresence('${candidate.id}')">
+                            ${isPresent ? '✓' : ''}
+                        </button>
+                    </div>
+                `;
+                listContainer.appendChild(li);
+            });
+
+            statsDisplay.textContent = `${presentCount} / ${candidates.length} Presentes`;
+        }
+
+        async function addName() {
+            const name = nameInput.value.trim();
+            if (name) {
+                const formattedName = name.charAt(0).toUpperCase() + name.slice(1);
+                
+                // Check if already exists in frontend state
+                if (candidates.some(c => c.name.toLowerCase() === formattedName.toLowerCase())) {
+                    alert("Esta pessoa já está na lista.");
+                    return;
+                }
+
+                showLoading();
+                const { data, error } = await supabase
+                    .from('candidates')
+                    .insert([{ name: formattedName }])
+                    .select();
+                    
+                if (error) {
+                    console.error(error);
+                    alert("Erro ao adicionar.");
+                } else if (data && data.length > 0) {
+                    candidates.push(data[0]);
+                    candidates.sort((a, b) => a.name.localeCompare(b.name));
+                    nameInput.value = '';
+                    renderList();
+                }
+                hideLoading();
+            }
+        }
+
+        nameInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') addName();
+        });
+
+        async function togglePresence(candidateId) {
+            showLoading();
+            const date = getCurrentDate();
+            const isCurrentlyPresent = currentPresentIds.includes(candidateId);
+            const newStatus = !isCurrentlyPresent;
+
+            // Use Upsert to either insert new record or update existing one for this date/candidate
+            const { error } = await supabase
+                .from('attendances')
+                .upsert({ 
+                    date: date, 
+                    candidate_id: candidateId, 
+                    is_present: newStatus 
+                }, { onConflict: 'date,candidate_id' });
+
+            if (error) {
+                console.error("Erro ao atualizar presença:", error);
+                alert("Falha ao salvar presença.");
+            } else {
+                if (newStatus) {
+                    currentPresentIds.push(candidateId);
+                } else {
+                    currentPresentIds = currentPresentIds.filter(id => id !== candidateId);
+                }
+                renderList();
+            }
+            hideLoading();
+        }
+
+        // Edit Modal
+        const editModal = document.getElementById('edit-modal');
+        const editNameInput = document.getElementById('edit-name-input');
+        const editOriginalId = document.getElementById('edit-original-id');
+
+        function openEditModal(id, name) {
+            editOriginalId.value = id;
+            editNameInput.value = name;
+            editModal.classList.add('active');
+        }
+
+        function closeEditModal() {
+            editModal.classList.remove('active');
+        }
+
+        async function saveEdit() {
+            const id = editOriginalId.value;
+            const newName = editNameInput.value.trim();
+            const candidate = candidates.find(c => c.id === id);
+            
+            if (newName && candidate && newName !== candidate.name) {
+                showLoading();
+                const { error } = await supabase
+                    .from('candidates')
+                    .update({ name: newName })
+                    .eq('id', id);
+                    
+                if (error) {
+                    console.error("Erro ao editar:", error);
+                    alert("Erro ao atualizar o nome.");
+                } else {
+                    candidate.name = newName;
+                    candidates.sort((a, b) => a.name.localeCompare(b.name));
+                    renderList();
+                    closeEditModal();
+                }
+                hideLoading();
+            } else if (candidate && newName === candidate.name) {
+                closeEditModal();
+            } else {
+                alert("Nome inválido.");
+            }
+        }
+
+        async function deleteStudent() {
+            const id = editOriginalId.value;
+            const candidate = candidates.find(c => c.id === id);
+            
+            if (candidate && confirm(`Remover ${candidate.name} da lista para sempre?`)) {
+                showLoading();
+                // Because of ON DELETE CASCADE in SQL, attendances are deleted automatically
+                const { error } = await supabase
+                    .from('candidates')
+                    .delete()
+                    .eq('id', id);
+                    
+                if (error) {
+                    console.error("Erro ao deletar:", error);
+                    alert("Erro ao remover candidata.");
+                } else {
+                    candidates = candidates.filter(c => c.id !== id);
+                    currentPresentIds = currentPresentIds.filter(pid => pid !== id);
+                    renderList();
+                    closeEditModal();
+                }
+                hideLoading();
+            }
+        }
+
+        // History Modal
+        const historyModal = document.getElementById('history-modal');
+        const historyList = document.getElementById('history-list');
+
+        async function openHistoryModal() {
+            showLoading();
+            
+            // Query to get unique dates where at least one person was present
+            // In a small app, we can group by manually or use RPC.
+            // Using a simple query since it's a small dataset.
+            const { data, error } = await supabase
+                .from('attendances')
+                .select('date')
+                .eq('is_present', true);
+                
+            hideLoading();
+            
+            if (error) {
+                console.error("Erro ao carregar histórico:", error);
+                alert("Erro ao carregar histórico.");
+                return;
+            }
+            
+            historyList.innerHTML = '';
+            
+            // Group by date to count
+            const dateCounts = {};
+            (data || []).forEach(row => {
+                dateCounts[row.date] = (dateCounts[row.date] || 0) + 1;
+            });
+            
+            const dates = Object.keys(dateCounts);
+            
+            if (dates.length === 0) {
+                historyList.innerHTML = '<li style="text-align:center; color: var(--text-light); padding: 1rem;">Nenhum registro de presença ainda.</li>';
+            } else {
+                dates.sort((a, b) => new Date(b) - new Date(a));
+                
+                dates.forEach(date => {
+                    const [year, month, day] = date.split('-');
+                    const formattedDate = `${day}/${month}/${year}`;
+                    const count = dateCounts[date];
+                    
+                    const li = document.createElement('li');
+                    li.className = 'history-item';
+                    li.innerHTML = `
+                        <span class="history-date">${formattedDate}</span>
+                        <span class="history-count">${count} presentes</span>
+                    `;
+                    li.onclick = () => {
+                        dateInput.value = date;
+                        dateChanged();
+                        closeHistoryModal();
+                    };
+                    historyList.appendChild(li);
+                });
+            }
+            
+            historyModal.classList.add('active');
+        }
+
+        function closeHistoryModal() {
+            historyModal.classList.remove('active');
+        }
+
+        // Download Report Feature (PDF)
+        function downloadReport() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            const date = getCurrentDate();
+            const [year, month, day] = date.split('-');
+            const formattedDate = `${day}/${month}/${year}`;
+            
+            const presentStudents = candidates.filter(c => currentPresentIds.includes(c.id)).map(c => c.name);
+            const absentStudents = candidates.filter(c => !currentPresentIds.includes(c.id)).map(c => c.name);
+            
+            // Header
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(16);
+            doc.text("LISTA DE PRESENÇA - ENSAIOS DAS MENINAS", 105, 20, null, null, "center");
+            
+            doc.setFont("helvetica", "normal");
+            doc.setFontSize(12);
+            doc.text(`Data: ${formattedDate}`, 20, 30);
+            doc.text(`Total Presentes: ${presentStudents.length} / ${candidates.length}`, 20, 38);
+            
+            let currentY = 50;
+            
+            // Presentes
+            doc.setFont("helvetica", "bold");
+            doc.text(`--- PRESENTES (${presentStudents.length}) ---`, 20, currentY);
+            currentY += 8;
+            
+            doc.setFont("helvetica", "normal");
+            if (presentStudents.length === 0) {
+                doc.text("Ninguém marcou presença.", 20, currentY);
+                currentY += 8;
+            } else {
+                presentStudents.sort((a, b) => a.localeCompare(b)).forEach(s => {
+                    if (currentY > 280) { doc.addPage(); currentY = 20; }
+                    doc.text(`[ X ]  ${s}`, 25, currentY);
+                    currentY += 8;
+                });
+            }
+            
+            currentY += 5;
+            
+            // Ausentes
+            doc.setFont("helvetica", "bold");
+            if (currentY > 280) { doc.addPage(); currentY = 20; }
+            doc.text(`--- FALTARAM (${absentStudents.length}) ---`, 20, currentY);
+            currentY += 8;
+            
+            doc.setFont("helvetica", "normal");
+            if (absentStudents.length === 0) {
+                doc.text("Todos estavam presentes!", 20, currentY);
+            } else {
+                absentStudents.sort((a, b) => a.localeCompare(b)).forEach(s => {
+                    if (currentY > 280) { doc.addPage(); currentY = 20; }
+                    doc.text(`[   ]  ${s}`, 25, currentY);
+                    currentY += 8;
+                });
+            }
+
+            // Save PDF
+            doc.save(`Lista_Presenca_${day}_${month}_${year}.pdf`);
+        }
+
+        // Boot
+        initData();
+    </script>
+</body>
+</html>
