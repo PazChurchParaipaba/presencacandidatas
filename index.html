@@ -478,7 +478,7 @@
             showLoading();
             
             // Fetch candidates
-            const { data: cData, error: cError } = await supabase
+            const { data: cData, error: cError } = await db
                 .from('candidates')
                 .select('*')
                 .order('name');
@@ -496,7 +496,7 @@
         }
 
         async function loadAttendanceForDate(date) {
-            const { data: aData, error: aError } = await supabase
+            const { data: aData, error: aError } = await db
                 .from('attendances')
                 .select('candidate_id, is_present')
                 .eq('date', date)
@@ -561,7 +561,7 @@
                 }
 
                 showLoading();
-                const { data, error } = await supabase
+                const { data, error } = await db
                     .from('candidates')
                     .insert([{ name: formattedName }])
                     .select();
@@ -590,7 +590,7 @@
             const newStatus = !isCurrentlyPresent;
 
             // Use Upsert to either insert new record or update existing one for this date/candidate
-            const { error } = await supabase
+            const { error } = await db
                 .from('attendances')
                 .upsert({ 
                     date: date, 
@@ -634,7 +634,7 @@
             
             if (newName && candidate && newName !== candidate.name) {
                 showLoading();
-                const { error } = await supabase
+                const { error } = await db
                     .from('candidates')
                     .update({ name: newName })
                     .eq('id', id);
@@ -663,7 +663,7 @@
             if (candidate && confirm(`Remover ${candidate.name} da lista para sempre?`)) {
                 showLoading();
                 // Because of ON DELETE CASCADE in SQL, attendances are deleted automatically
-                const { error } = await supabase
+                const { error } = await db
                     .from('candidates')
                     .delete()
                     .eq('id', id);
@@ -691,7 +691,7 @@
             // Query to get unique dates where at least one person was present
             // In a small app, we can group by manually or use RPC.
             // Using a simple query since it's a small dataset.
-            const { data, error } = await supabase
+            const { data, error } = await db
                 .from('attendances')
                 .select('date')
                 .eq('is_present', true);
